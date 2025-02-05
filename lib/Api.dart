@@ -14,7 +14,6 @@ class _AirQualityScreenState extends State<AQIScreen> {
   bool isLoading = true;
 
   Future<void> fetchAirQuality() async {
-    // Latitude and Longitude for Bangkok
     final latitude = 13.7563;
     final longitude = 100.5018;
 
@@ -31,8 +30,7 @@ class _AirQualityScreenState extends State<AQIScreen> {
           setState(() {
             city = data['data']['city']['name'];
             aqi = data['data']['aqi'];
-            temperature =
-                data['data']['iaqi']['t']['v'].toDouble(); // ดึงค่าอุณหภูมิ
+            temperature = data['data']['iaqi']['t']['v'].toDouble();
             isLoading = false;
           });
         } else {
@@ -80,65 +78,108 @@ class _AirQualityScreenState extends State<AQIScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.blueGrey[50],
       appBar: AppBar(
         title: Text(
           "Air Quality Index (AQI)",
           style: TextStyle(
-              fontSize: 25, color: const Color.fromARGB(255, 255, 255, 255)),
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            fontFamily: 'Roboto',
+          ),
         ),
-        backgroundColor: const Color.fromARGB(255, 58, 133, 170),
+        backgroundColor: Color(0xFF3A85AA),
         centerTitle: true,
       ),
       body: Center(
         child: isLoading
-            ? CircularProgressIndicator()
-            : Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    city,
-                    style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(height: 10),
-                  Container(
-                    padding: EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: getAqiColor(aqi),
-                      borderRadius: BorderRadius.circular(10),
+            ? CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF3A85AA)),
+              )
+            : Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    AnimatedDefaultTextStyle(
+                      style: TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF3A85AA),
+                        fontFamily: 'Roboto',
+                      ),
+                      duration: Duration(milliseconds: 500),
+                      child: Text(city),
                     ),
-                    child: Column(
-                      children: [
-                        Text(
-                          "$aqi",
-                          style: TextStyle(
-                            fontSize: 64,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                    SizedBox(height: 20),
+                    AnimatedContainer(
+                      duration: Duration(milliseconds: 300),
+                      padding: EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: getAqiColor(aqi),
+                        borderRadius: BorderRadius.circular(15),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.3),
+                            spreadRadius: 2,
+                            blurRadius: 10,
+                            offset: Offset(0, 4),
                           ),
-                        ),
-                        Text(
-                          aqi > 150 ? "Unhealthy" : "Good",
-                          style: TextStyle(
-                              fontSize: 20,
-                              color: const Color.fromARGB(255, 255, 255, 255)),
-                        ),
-                      ],
+                        ],
+                      ),
+                      child: Column(
+                        children: [
+                          Text(
+                            "$aqi",
+                            style: TextStyle(
+                              fontSize: 80,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                          Text(
+                            aqi > 150 ? "Unhealthy" : "Good",
+                            style: TextStyle(
+                              fontSize: 22,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 10),
-                  Text(
-                    "Temperature: ${temperature.toStringAsFixed(1)}°C",
-                    style: TextStyle(
-                        fontSize: 18,
-                        color: const Color.fromARGB(255, 0, 0, 0)),
-                  ),
-                  SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: fetchAirQuality,
-                    child: Text("Refresh"),
-                  ),
-                ],
+                    SizedBox(height: 20),
+                    AnimatedSwitcher(
+                      duration: Duration(milliseconds: 300),
+                      child: Text(
+                        "Temperature: ${temperature.toStringAsFixed(1)}°C",
+                        key: ValueKey<double>(temperature),
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.black87,
+                          fontFamily: 'Roboto',
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 30),
+                    ElevatedButton(
+                      onPressed: fetchAirQuality,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color(0xFF3A85AA),
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 30, vertical: 15),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(25),
+                        ),
+                        elevation: 5,
+                        shadowColor: Colors.blueAccent,
+                      ),
+                      child: Text(
+                        "Refresh",
+                        style: TextStyle(fontSize: 18, color: Colors.white),
+                      ),
+                    ),
+                  ],
+                ),
               ),
       ),
     );
